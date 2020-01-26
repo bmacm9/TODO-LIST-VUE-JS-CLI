@@ -17,6 +17,8 @@ export default {
 </script>
 
 <style>
-#app {
+.row{
+  margin-right: 0;
+  margin-left: 0;
 }
 </style>
