@@ -1,61 +1,22 @@
 <template lang="html">
 
-  <section class="todo-list">
+  <section class="todo-list col-12 col-lg-9">
     <!-- Cabecero -->
     <cabecero></cabecero>
 
     <!-- Input boton introducir TODO -->
-    <div class="row mb-3">
-      <div class="col-9 ml-5">
-        <input @keyup.enter="add" class="w-100 inputText p-1" type="text" v-model="todo" placeholder="¿Qué quieres recordar?"/>
-      </div>
-      <div class="col-2 ml-4">
-        <button class="btn btn-info" @click="add" type="button">Agregar tarea</button>
-      </div>
-    </div>
-
+    <introducirTodo v-on:addTodo="add"></introducirTodo>
 
     <!-- Pendientes y borrar -->
-    <div class="row pt-2 pb-2 mb-4 border-top border-bottom">
-      <div class="col-4 ml-5">
-        <h5 v-if="total>0"> {{ pendiente }} Tareas pendientes de un total de {{ total }} </h5>
-      </div>
-      <div class="col-4">
-        <a href="#" class="link" v-if="total>0" v-on:click="borrarCompletados"><strong>x</strong> Borrar tareas completadas</a> 
-      </div>
-    </div>
-
-
+    <borrarAcabados :total="total" :pendiente="pendiente" @borrarCompletados="borrarCompletados"></borrarAcabados>
 
     <!-- Cada uno de los TODO -->
-    <div class="row mb-5">
+    <main class="row mb-5">
       <div :key="tarea.todo" v-for="tarea in ordenado" class="col-12">
-        <nota :tarea="tarea"></nota>
+        <nota @cambiarPrioridadAlta="cambiarPriAlta(tarea)" @cambiarPrioridadMedia="cambiarPriMedia(tarea)" @cambiarPrioridadBaja="cambiarPriBaja(tarea)" @borrarTarea="borrarTarea(tarea)" :tarea="tarea"></nota>
       </div>
-    </div>
-    
-    <!-- Ordenar -->
-    <div class="row ml-5">
-      <div class="col-12">
-        <form v-if="total>1">
-          <div class="row">
-            <div class="col-1">
-              <input type="radio" name="orden" checked value="ascendente" v-model="asc">
-            </div>
-            <div class="col-5">
-              <label for="orden">Ordenar Alfabéticamente Ascendente</label>
-            </div>
-            <div class="col-1">
-              <input type="radio" name="orden" value="descendente" v-model="asc">
-            </div>
-            <div class="col-5">
-              <label for="orden">Ordenar Alfabéticamente Descendente</label>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
+    </main>
+   
     <!-- Pie de pagina -->
     <pie class="pb-3 pt-2 border-top"></pie>
 
@@ -63,48 +24,78 @@
 
 </template>
 
+
 <script lang="js">
+
 import nota from './nota.vue';
 import cabecero from './cabecero.vue';
 import pie from './pie.vue';
+import introducirTodo from './introducirTODO.vue';
+import borrarAcabados from './borrarAcabados.vue';
+
+import axios from 'axios';
 
   export default  {
     components: {
       nota,
       cabecero,
-      pie
+      pie,
+      introducirTodo,
+      borrarAcabados
     },
     name: 'todo-list',
-    props: ['tarea'],
+    props: [],
     mounted() {
         if (localStorage.getItem("tareas")) {
             try {
                 this.tareas = JSON.parse(localStorage.getItem("tareas"));
+                axios.get('https://www.omdbapi.com/?s=spider&apikey=dc81505b')
+                  .then(function(response){
+                    console.log(response.data.Search[0].Title);
+                  });
             }
             catch (e) {
                 localStorage.removeItem("tareas");
             }
 
         }
+
+
     },
     updated() {
         this.save();
     },
     data () {
       return {
-        todo: "",
         tareas: [],
-        asc: "ascendente"
+        asc: "ascendente",
+        prioridad: "baja",
+        completada: false,
       }
     },
     methods: {
-      add() {
-            if (!this.todo) {
-                return;
-            }
-            this.tareas.push({ "todo": this.todo, "completada": this.completada });
-            this.todo = "";
-        },
+      cambiarPriAlta(tarea){
+     
+        tarea.prioridad="alta";
+        this.sorting();
+        this.save();
+      },
+      cambiarPriMedia(tarea){
+     
+        tarea.prioridad="media";
+        this.save();
+      },
+      cambiarPriBaja(tarea){
+     
+        tarea.prioridad="baja";
+        this.save();
+      },
+      add(todo) {
+        if (!todo) {
+            return;
+        }
+        this.tareas.push({ "todo": todo, "completada": this.completada, "prioridad":this.prioridad });
+      },
         save() {
             const parsed = JSON.stringify(this.tareas);
             localStorage.setItem("tareas", parsed);
@@ -115,20 +106,29 @@ import pie from './pie.vue';
             });
             this.save();
         },
+        borrarTarea(tarea){
+          this.tareas.splice(this.tareas.indexOf(tarea), 1);
+        },
         sorting(){
-          if (this.asc == "ascendente") {
               return this.tareas.slice().sort(function (nota1, nota2) {
-                  var a = nota1.todo.toLowerCase();
-                  var b = nota2.todo.toLowerCase();
-                  return (a < b) ? -1 : (a > b) ? 1 : 0;
+                var a;
+                var b;
+                  if(nota1.prioridad=="baja"){
+                    a = 1;
+                  }else if(nota1.prioridad=="media"){
+                    a = 2;
+                  }else{
+                    a = 3
+                  }
+                  if(nota2.prioridad=="baja"){
+                    b = 1;
+                  }else if(nota2.prioridad=="media"){
+                    b = 2;
+                  }else{
+                    b = 3
+                  }
+                  return (a > b) ? -1 : (a < b) ? 1 : 0;
               });
-          } else {
-              return this.tareas.slice().sort(function (nota1, nota2) {
-                  var a = nota1.todo.toLowerCase()
-                  var b = nota2.todo.toLowerCase();
-                  return (a < b) ? 1 : (a > b) ? -1 : 0;
-              });
-          }
         },
     },
     computed: {
@@ -158,20 +158,8 @@ import pie from './pie.vue';
 </script>
 
 <style scoped>
-  .todo-list {
-    background-color: rgb(39, 36, 32);
-    color: white;
-  }
-
-  .active {
-    background-color: green;
-  }
-
-  .inputText{
-    border-radius: 10px;
-  }
-
-  .link{
-    color: rgb(189, 170, 64);
-  }
+.todo-list {
+  background-color: rgb(39, 36, 32);
+  color: white;
+}
 </style>

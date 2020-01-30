@@ -1,17 +1,32 @@
 <template>
   <div id="app">
-    <todoList></todoList>
+    <olymcabecera></olymcabecera>
+    <olymhero></olymhero>
+    <olysection></olysection>
+    <olymCarousel></olymCarousel>
+    <olymPie></olymPie>
+    <olymCookies></olymCookies>
   </div>
 </template>
 
 <script>
 
-import todoList from './components/todoList.vue';
+import olymcabecera from './components/olymcabecera.vue';
+import olymhero from './components/olymhero.vue';
+import olysection from './components/olymsection.vue';
+import olymCarousel from './components/olymCarousel.vue';
+import olymPie from './components/olymPie.vue';
+import olymCookies from './components/olymCookies.vue'
 
 export default {
   name: "app",
   components: {
-    todoList
+    olymcabecera,
+    olymhero,
+    olysection,
+    olymCarousel,
+    olymPie,
+    olymCookies
   }
 };
 </script>
@@ -21,4 +36,8 @@ export default {
   margin-right: 0;
   margin-left: 0;
 }
+.container-fluid{
+  padding: 0;
+}
+
 </style>
