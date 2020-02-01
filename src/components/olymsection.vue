@@ -1,10 +1,9 @@
 <template lang="html">
 
   <section class="olymsection row m-2">
-            <!-- FIRST ARTICLE -->
-            <router-view></router-view>
-            
-            <olymAside></olymAside>
+
+    <olymArticles></olymArticles>
+    <olymAside></olymAside>
   </section>
 
 </template>
@@ -12,9 +11,11 @@
 <script lang="js">
 
 import olymAside from './olymAside.vue';
+import olymArticles from './olymArticles.vue';
   export default  {
     components:{
-        olymAside
+        olymAside,
+        olymArticles
     },
     name: 'olymsection',
     props: [],

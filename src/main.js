@@ -2,23 +2,24 @@ import Vue from 'vue'
 import App from './App.vue'
 import VueRouter from 'vue-router';
 
-import olymArticles from './components/olymArticles.vue';
+import olympics from './components/olympics.vue'
 import todoList from './components/todoList.vue';
+import noticias from './components/noticias.vue';
 
 Vue.config.productionTip = false
 
 Vue.use(VueRouter);
 
 const routes = [
-  {path: '/home', component: olymArticles},
-  {path: '/notas', component: todoList},
-  {path: '*', component: olymArticles},
-  {path: '/', component: olymArticles}
+  {path: '/home', component: olympics},
+  {path: '/notas', component: todoList, name: "notas"},
+  {path: '/noticias', component: noticias},
+  {path: '*', component: olympics},
+  {path: '/', component: olympics}
 ];
 
 const router = new VueRouter({
-  routes,
-  mode: 'history'
+  routes
 });
 
 new Vue({

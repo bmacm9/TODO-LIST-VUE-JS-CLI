@@ -1,23 +1,32 @@
 <template lang="html">
 
   <section class="nota border">
+
+  
     <label v-bind:class="{active: tarea.completada}" class="w-100">
       <div class="row justify-content-around align-items-center">
         <div class="col-1 d-inline mt-3">
           <input type="checkbox" name="" v-model="tarea.completada"/><span class="cb-icon"></span>
         </div>
-        <div class="col-9 d-inline">
+        <div class="col-6 col-lg-9 d-inline">
           <h2>{{tarea.todo}}</h2>
           <button v-bind:class="{verde: alta}" @click="cambiarPrioridadAlta" type="button">Alta</button>
           <button v-bind:class="{amarillo: media}" @click="cambiarPrioridadMedia" type="button">Media</button
           ><button v-bind:class="{rojo: baja}" @click="cambiarPrioridadBaja" type="button">Baja</button>
         </div>
 
-        <div class="col-1 mr-3 mr-md-0 d-inline">
+        <div class="col-2 col-lg-1 mr-3 mr-md-0 d-inline">
+          <p class="text">añadido hace {{ transcurrido }} minutos</p>
+
+        </div>
+
+        <div class="col-2 col-lg-1 mr-3 mr-md-0 d-inline">
+        
           <img @click="borrar(tarea)" class="borrar" src="../assets/trash.png"/>
         </div>
       </div>
     </label>
+
   </section>
 
 </template>
@@ -28,7 +37,6 @@
     name: 'nota',
     props: ['tarea'],
     mounted () {
-      console.log(this.tarea.prioridad)
     },
     data () {
       return {
@@ -54,6 +62,15 @@
 
     },
     computed: {
+      transcurrido: function(){
+        var timeNota = this.tarea.date
+        var timeNow = new Date().getTime();
+        var totalSeconds = (timeNow - timeNota)/1000
+
+        var minutes = Math.floor(totalSeconds/60);
+
+        return minutes;
+      },
       alta(){
         if(this.tarea.prioridad != "alta"){
           return false;
@@ -144,19 +161,21 @@ label .cb-icon::before {
 .verde {
   border-color: green;
   background-color: green;
-    color: white;
+  color: white;
   font-weight: bold;
 }
 .amarillo {
   border-color: rgb(124, 106, 0);
   background-color: rgb(124, 106, 0);
-    color: white;
+  color: white;
   font-weight: bold;
 }
 .rojo {
   border-color: red;
   background-color: red;
-    color: white;
+  color: white;
   font-weight: bold;
 }
+
+
 </style>
